@@ -14,7 +14,7 @@ class User(UserBase):
 	birthday: date | None =  Field(default=None)
 
 
-class UserLogin(UserBase):
+class UserAuth(UserBase):
 	password: str = Field(..., min_length=8, max_length=64)
 
 
