@@ -8,14 +8,14 @@ class Password(BaseModel):
 
 
 class UserBase(BaseModel):
-	user_id: UUID = Field(...)
-	email: EmailStr = Field(...)
+    user_id: UUID = Field(...)
+    email: EmailStr = Field(...)
 
 
 class User(UserBase):
-	first_name: str = Field(..., min_length=1, max_length=50)
-	last_name: str = Field(..., min_length=1, max_length=50)
-	birthday: date | None =  Field(default=None)
+    first_name: str = Field(..., min_length=1, max_length=50)
+    last_name: str = Field(..., min_length=1, max_length=50)
+    birthday: date | None = Field(default=None)
 
 
 class UserRegister(User, Password):
@@ -27,8 +27,8 @@ class UserLogin(UserBase, Password):
 
 
 class Tweet(BaseModel):
-	tweet_id: UUID = Field(...)
-	content: str = Field(..., min_length=1, max_length=256)
-	created_at: datetime = Field(default=datetime.now())
-	updated_at: datetime | None = Field(default=None)
-	by: User = Field(...)
+    tweet_id: UUID = Field(...)
+    content: str = Field(..., min_length=1, max_length=256)
+    created_at: datetime = Field(default=datetime.now())
+    updated_at: datetime | None = Field(default=None)
+    by: User = Field(...)

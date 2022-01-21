@@ -10,6 +10,7 @@ app = FastAPI()
 Users(app)
 Tweets(app)
 
+
 @app.get("/")
 def inicio():
     return {"Hello": "World"}
