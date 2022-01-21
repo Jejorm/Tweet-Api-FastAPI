@@ -3,6 +3,10 @@ from uuid import UUID
 from pydantic import BaseModel, EmailStr, Field
 
 
+class Password(BaseModel):
+    password: str = Field(..., min_length=8, max_length=64)
+
+
 class UserBase(BaseModel):
 	user_id: UUID = Field(...)
 	email: EmailStr = Field(...)
@@ -14,8 +18,12 @@ class User(UserBase):
 	birthday: date | None =  Field(default=None)
 
 
-class UserAuth(UserBase):
-	password: str = Field(..., min_length=8, max_length=64)
+class UserRegister(User, Password):
+    pass
+
+
+class UserLogin(UserBase, Password):
+    pass
 
 
 class Tweet(BaseModel):
