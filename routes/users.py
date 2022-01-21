@@ -1,6 +1,6 @@
 import json
-from models import User, UserLogin, UserRegister
 from fastapi import Body, status
+from models import User, UserLogin, UserRegister
 
 
 def Users(app):
@@ -26,13 +26,13 @@ def Users(app):
            - email: EmailStr
            - first_name: str
            - last_name: str
-           - birthday: date
+           - birthday: date | None
 
        """
         with open("data/users.json", "r+", encoding="utf-8") as f:
             results = json.load(f)
 
-            user_dict = dict(user)
+            user_dict = user.dict()
             user_dict["user_id"] = str(user_dict["user_id"])
             user_dict["birthday"] = str(user_dict["birthday"])
 
@@ -74,7 +74,7 @@ def Users(app):
            - email: EmailStr
            - first_name: str
            - last_name: str
-           - birthday: date
+           - birthday: date | None
         """
         with open("data/users.json", "r", encoding="utf-8") as f:
             results = json.load(f)

@@ -1,5 +1,7 @@
+import json
+import pprint
+from fastapi import Body, status
 from models import Tweet
-from fastapi import status
 
 
 def Tweets(app):
@@ -34,8 +36,42 @@ def Tweets(app):
         summary="Post a Tweet",
         tags=["Tweets"]
     )
-    def tweet():
-        pass
+    def tweet(tweet: Tweet = Body(...)):
+        """
+        This path operation post a tweet in the app
+
+        Parameters:
+           - Request Body
+               - tweet: Tweet
+        
+        Returns a json with the tweet information
+           - tweet_id: UUID
+           - content: str 
+           - created_at: datetime
+           - updated_at: datetime | None
+           - by: User
+
+       """
+        with open("data/tweets.json", "r+", encoding="utf-8") as f:
+
+            results = json.load(f)
+
+            tweet_dict = tweet.dict()
+
+            tweet_dict["tweet_id"] = str(tweet_dict["tweet_id"])
+            tweet_dict["created_at"] = str(tweet_dict["created_at"])
+            tweet_dict["updated_at"] = str(tweet_dict["updated_at"])
+
+            tweet_dict["by"]["user_id"] = str(tweet_dict["by"]["user_id"])
+            tweet_dict["by"]["birthday"] = str(tweet_dict["by"]["birthday"])
+
+            results.append(tweet_dict)
+
+            f.seek(0)
+            json.dump(results, f)
+
+            return tweet
+
 
     # Update a tweet
     @app.put(
