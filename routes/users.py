@@ -15,20 +15,19 @@ def Users(app):
     )
     def sign_up(user: UserRegister = Body(...)):
         """
-       Signup
+        This path operation register a user in the app
 
-       This path operation register a user in the app.
-
-       Params:
+        Parameters:
            - Request Body
                - user: UserRegister
-
-       Returns a json with the basic user information
+        
+        Returns a json list with the basic user information
            - user_id: UUID
            - email: EmailStr
            - first_name: str
            - last_name: str
            - birthday: date
+
        """
         with open("data/users.json", "r+", encoding="utf-8") as f:
             results = json.load(f)
@@ -44,10 +43,7 @@ def Users(app):
 
         return user
 
-
-
-# Login a User
-
+    # Login a User
     @app.post(
         path="/signin",
         response_model=User,
@@ -67,7 +63,23 @@ def Users(app):
         tags=["Users"]
     )
     def show_all_users():
-        pass
+        """
+        This path operation shows all users in the app
+
+        Parameters:
+           - None
+
+        Returns a json list with all users in the app
+           - user_id: UUID
+           - email: EmailStr
+           - first_name: str
+           - last_name: str
+           - birthday: date
+        """
+        with open("data/users.json", "r", encoding="utf-8") as f:
+            results = json.load(f)
+
+            return results
 
     # Show a User
     @app.get(
