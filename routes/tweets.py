@@ -1,34 +1,14 @@
 import json
-import pprint
 from fastapi import Body, status
 from models import Tweet
+from tools.tools import * 
 
 
 def Tweets(app):
 
-    # Show all Tweets
-    @app.get(
-        path="/tweets",
-        response_model=list[Tweet],
-        status_code=status.HTTP_200_OK,
-        summary="Show all Tweets",
-        tags=["Tweets"]
-    )
-    def show_all_tweets():
-        pass
+    database = "data/tweets.json"
 
-    # Show a Tweet
-    @app.get(
-        path="/tweets/{tweet_id}",
-        response_model=Tweet,
-        status_code=status.HTTP_200_OK,
-        summary="Show a Tweet",
-        tags=["Tweets"]
-    )
-    def show_tweet():
-        pass
-
-    # Post a Tweet
+   # Post a Tweet
     @app.post(
         path="/tweet",
         response_model=Tweet,
@@ -43,7 +23,7 @@ def Tweets(app):
         Parameters:
            - Request Body
                - tweet: Tweet
-        
+
         Returns a json with the tweet information
            - tweet_id: UUID
            - content: str 
@@ -52,26 +32,60 @@ def Tweets(app):
            - by: User
 
        """
-        with open("data/tweets.json", "r+", encoding="utf-8") as f:
+        with open(database, "r+", encoding="utf-8") as d:
 
-            results = json.load(f)
+            databse_registers = json.load(d)
 
-            tweet_dict = tweet.dict()
+            request_dict = tweet.dict()
 
-            tweet_dict["tweet_id"] = str(tweet_dict["tweet_id"])
-            tweet_dict["created_at"] = str(tweet_dict["created_at"])
-            tweet_dict["updated_at"] = str(tweet_dict["updated_at"])
+            request_dict_serialized = serialize_user(request_dict)
 
-            tweet_dict["by"]["user_id"] = str(tweet_dict["by"]["user_id"])
-            tweet_dict["by"]["birthday"] = str(tweet_dict["by"]["birthday"])
+            databse_registers.append(request_dict_serialized)
 
-            results.append(tweet_dict)
+            d.seek(0)
 
-            f.seek(0)
-            json.dump(results, f)
+            json.dump(databse_registers, d)
 
             return tweet
 
+    # Show all Tweets
+    @app.get(
+        path="/",
+        response_model=list[Tweet],
+        status_code=status.HTTP_200_OK,
+        summary="Show all Tweets",
+        tags=["Tweets"]
+    )
+    def home():
+        """
+        This path operation shows all tweets in the app
+
+        Parameters:
+           - None
+
+        Returns a json list with all the tweets in the app with the following information:
+           - tweet_id: UUID
+           - content: str 
+           - created_at: datetime
+           - updated_at: datetime | None
+           - by: User
+        """
+        with open(database, "r", encoding="utf-8") as d:
+
+            database_registers = json.load(d)
+
+            return database_registers
+
+    # Show a Tweet
+    @app.get(
+        path="/tweets/{tweet_id}",
+        response_model=Tweet,
+        status_code=status.HTTP_200_OK,
+        summary="Show a Tweet",
+        tags=["Tweets"]
+    )
+    def show_tweet():
+        pass
 
     # Update a tweet
     @app.put(
