@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date
 import json
 from pydantic import UUID4
 
@@ -21,26 +21,29 @@ def write_file(registers, file):
         json.dump(registers, f)
 
 
-def check_user(user_database, operation, user_body=None, user_id=None):
+def check_user(database_register, operation, field_body=None, field_id=None):
 
-    if operation == "email":
-        if user_database["email"] != user_body.email:
+    if operation == "register":
+        if database_register["email"] != field_body.email:
             return True 
 
     if operation == "login":
-        if user_database["email"] == user_body.email and user_database["password"] == user_body.password:
+        if database_register["email"] == field_body.email and database_register["password"] == field_body.password:
             return True
     
     if operation == "user_id":
-        if str(user_database["user_id"]) == str(user_id):
+        if str(database_register["user_id"]) == str(field_id):
             return True
 
 
 def serialize_user(user, user_id=None):
 
-    request_dict = user.dict()
+    if type(user) is not dict:
+        request_dict = user.dict()
+    else:
+        request_dict = user
 
-    serialize_formats = [UUID4, date, datetime]
+    serialize_formats = [UUID4, date]
 
     for key in request_dict:
         value = request_dict[key]
@@ -53,7 +56,8 @@ def serialize_user(user, user_id=None):
             request_dict[key] = str(value)
 
     if user_id:
-        request_dict["user_id"] = str(user_id)
+        request_dict[f"user_id"] = str(user_id)
+
 
     return request_dict
 

@@ -1,32 +1,28 @@
-from datetime import date, datetime
-from uuid import UUID
-from pydantic import BaseModel, EmailStr, Field
+from datetime import date
+from pydantic import BaseModel, EmailStr, Field, UUID4
 
 
-class User_Email(BaseModel):
+class UserEmail(BaseModel):
     email: EmailStr = Field(...)
 
 
-class User_Id(BaseModel):
-    user_id: UUID = Field(...)
+class UserId(BaseModel):
+    user_id: UUID4 = Field(...)
 
 
 class UserPassword(BaseModel):
     password: str = Field(..., min_length=8, max_length=64)
 
 
-class User(User_Email):
+class User(UserEmail):
     first_name: str = Field(..., min_length=1, max_length=50)
     last_name: str = Field(..., min_length=1, max_length=50)
     birthday: date | None = Field(default=None)
 
 
-class Auth(User_Id, UserPassword):
+class Auth(UserId, UserPassword):
     ...
 
-
-class UserShow(User):
-    ...
 
 class UserUpdate(UserPassword, User):
     ...
@@ -36,20 +32,40 @@ class UserAllResponse(Auth, User):
     ...
 
 
-class UserLogin(UserPassword, User_Email):
+class UserLogin(UserPassword, UserEmail):
     ...
 
 
-class UserMessages(User_Email):
+class UserMessages(UserEmail):
     message: str = Field(...)
 
 
 
+class TweetPost(BaseModel):
+    content: str = Field(...)
+    by: UserEmail = Field(...)
 
 
-class Tweet(BaseModel):
-    tweet_id: UUID = Field(...)
-    content: str = Field(..., min_length=1, max_length=256)
-    created_at: datetime = Field(default=datetime.now())
-    updated_at: datetime | None = Field(default=None)
-    by: User = Field(...)
+class TweetUpdate(BaseModel):
+    content: str = Field(...)
+
+
+class TweetAllResponse(BaseModel):
+    tweet_id: UUID4 = Field(...)
+    content: str = Field(...)
+    created_at: str = Field(...)
+    updated_at: str = Field(...)
+    by: UserEmail = Field(...)
+
+
+class TweetResponse(BaseModel):
+    content: str = Field(...)
+    created_at: str = Field(...)
+    updated_at: str = Field(...)
+    by: UserEmail = Field(...)
+
+
+
+class TweetDeleteResponse(BaseModel):
+    tweet_id: UUID4 = Field(...)
+    message: str = Field(...)

@@ -1,7 +1,9 @@
-import json
-from fastapi import Body, status
-from models import Tweet
-from tools.tools import * 
+import uuid
+from datetime import datetime
+from pydantic import UUID4
+from fastapi import Body, Path, HTTPException, status
+from models import TweetPost, TweetResponse, TweetAllResponse, TweetUpdate, TweetDeleteResponse
+from tools.tools import read_file, write_file, overwrite_file
 
 
 def Tweets(app):
@@ -11,100 +13,108 @@ def Tweets(app):
    # Post a Tweet
     @app.post(
         path="/tweet",
-        response_model=Tweet,
+        response_model=TweetAllResponse,
         status_code=status.HTTP_201_CREATED,
         summary="Post a Tweet",
         tags=["Tweets"]
     )
-    def tweet(tweet: Tweet = Body(...)):
-        """
-        This path operation post a tweet in the app
+    def tweet(tweet: TweetPost = Body(...)):
 
-        Parameters:
-           - Request Body
-               - tweet: Tweet
+        database_registers = read_file(database)
 
-        Returns a json with the tweet information
-           - tweet_id: UUID
-           - content: str 
-           - created_at: datetime
-           - updated_at: datetime | None
-           - by: User
+        tweet_dict_serialized = tweet.dict()
+        tweet_dict_serialized["tweet_id"] = str(uuid.uuid4())
+        tweet_dict_serialized["created_at"] = str(datetime.now().strftime("%d/%m/%Y %H:%M"))
+        tweet_dict_serialized["updated_at"] = str(datetime.now().strftime("%d/%m/%Y %H:%M"))
 
-       """
-        with open(database, "r+", encoding="utf-8") as d:
+        database_registers.append(tweet_dict_serialized)
 
-            databse_registers = json.load(d)
+        write_file(database_registers, database)
 
-            request_dict = tweet.dict()
+        return tweet_dict_serialized
 
-            request_dict_serialized = serialize_user(request_dict)
-
-            databse_registers.append(request_dict_serialized)
-
-            d.seek(0)
-
-            json.dump(databse_registers, d)
-
-            return tweet
 
     # Show all Tweets
     @app.get(
         path="/",
-        response_model=list[Tweet],
+        response_model=list[TweetResponse],
         status_code=status.HTTP_200_OK,
         summary="Show all Tweets",
         tags=["Tweets"]
     )
     def home():
-        """
-        This path operation shows all tweets in the app
 
-        Parameters:
-           - None
-
-        Returns a json list with all the tweets in the app with the following information:
-           - tweet_id: UUID
-           - content: str 
-           - created_at: datetime
-           - updated_at: datetime | None
-           - by: User
-        """
-        with open(database, "r", encoding="utf-8") as d:
-
-            database_registers = json.load(d)
-
-            return database_registers
+        return(read_file(database))
 
     # Show a Tweet
     @app.get(
         path="/tweets/{tweet_id}",
-        response_model=Tweet,
+        response_model=TweetResponse,
         status_code=status.HTTP_200_OK,
         summary="Show a Tweet",
         tags=["Tweets"]
     )
-    def show_tweet():
-        pass
+    def show_tweet(tweet_id: UUID4 = Path(...)):
+        
+        database_registers = read_file(database)
+
+        for tweet in database_registers:
+            
+            if tweet["tweet_id"] == str(tweet_id):
+                return tweet
+
+        raise(HTTPException(status.HTTP_404_NOT_FOUND, detail="Tweet ID does not exists!"))
 
     # Update a tweet
     @app.put(
         path="/tweets/{tweet_id}",
-        response_model=Tweet,
+        response_model=TweetResponse,
         status_code=status.HTTP_200_OK,
         summary="Update a Tweet",
         tags=["Tweets"]
     )
-    def update_tweet():
-        pass
+    def update_tweet(tweet_id: UUID4 = Path(...), tweet_update: TweetUpdate = Body(...)):
+
+        database_registers = read_file(database)
+
+        for i, tweet in enumerate(database_registers):
+
+            if tweet["tweet_id"] == str(tweet_id):
+
+                tweet_dict_serialized = tweet_update.dict()
+
+                tweet_dict_serialized["by"] = database_registers[i]["by"]
+                tweet_dict_serialized["tweet_id"] = str(tweet_id)
+                tweet_dict_serialized["created_at"] = database_registers[i]["created_at"]
+                tweet_dict_serialized["updated_at"] = str(datetime.now().strftime("%d/%m/%Y %H:%M"))
+
+
+                database_registers[i] = tweet_dict_serialized
+
+                overwrite_file(database_registers, database)
+
+                return database_registers[i]
+
+        raise(HTTPException(status.HTTP_404_NOT_FOUND, detail="Tweet ID does not exists!"))
+
 
     # Delete a tweet
     @app.delete(
         path="/tweets/{tweet_id}",
-        response_model=Tweet,
+        response_model=TweetDeleteResponse,
         status_code=status.HTTP_200_OK,
         summary="Delete a Tweet",
         tags=["Tweets"]
     )
-    def delete_tweet():
-        pass
+    def delete_tweet(tweet_id: UUID4 = Path(...)):
+
+        database_registers = read_file(database)
+
+        for tweet in database_registers:
+            if tweet["tweet_id"] == str(tweet_id):
+                database_registers.remove(tweet)
+                overwrite_file(database_registers, database)
+
+                return TweetDeleteResponse(tweet_id=str(tweet_id), message="Tweet deleted successfully!")    
+        
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Tweet ID does not exists!")
