@@ -6,67 +6,61 @@ from pydantic import UUID4
 def read_file(file):
 
     with open(file, "r+", encoding="utf-8") as f:
-
         databse_registers = json.load(f)
-
         return databse_registers
 
 
-def write_file(registers, file):
+def modify_file(registers, file, mode):
 
-    with open(file, "r+", encoding="utf-8") as f:
-
+    with open(file, mode=mode, encoding="utf8") as f:
         f.seek(0)
-
         json.dump(registers, f)
 
 
-def check_user(database_register, operation, field_body=None, field_id=None):
+def check_user(database_register, operation=None, field_body=None, field_id=None):
 
-    if operation == "register":
+    if operation == "create":
         if database_register["email"] != field_body.email:
-            return True 
+            return True
 
     if operation == "login":
-        if database_register["email"] == field_body.email and database_register["password"] == field_body.password:
+        if (
+            database_register["email"] == field_body.email
+            and database_register["password"] == field_body.password
+        ):
             return True
-    
-    if operation == "user_id":
+
+    if field_id:
         if str(database_register["user_id"]) == str(field_id):
             return True
 
 
-def serialize_user(user, user_id=None):
+def check_tweet(tweet, tweet_id):
 
-    if type(user) is not dict:
-        request_dict = user.dict()
-    else:
-        request_dict = user
+    if tweet["tweet_id"] == str(tweet_id):
+        return True
 
-    serialize_formats = [UUID4, date]
+
+def stringify_user_fields(user, user_id):
+
+    request_dict = user.dict()
 
     for key in request_dict:
-        value = request_dict[key]
+        request_dict[key] = str(request_dict[key])
 
-        if type(value) is dict:
-            serialize_user(value)
-            continue
-
-        if type(value) in serialize_formats:
-            request_dict[key] = str(value)
-
-    if user_id:
-        request_dict[f"user_id"] = str(user_id)
-
-
+    request_dict["user_id"] = str(user_id)
     return request_dict
 
 
-def overwrite_file(registers, file):
+def stringify_tweet_fields(tweet, created_at, updated_at, tweet_id, by=None):
 
-    with open(file, "w", encoding="utf-8") as f:
+    request_dict = tweet.dict()
 
-        f.seek(0)
+    if by:
+        request_dict["by"] = by
 
-        json.dump(registers, f)
-    
+    request_dict["created_at"] = str(created_at)
+    request_dict["updated_at"] = str(updated_at)
+    request_dict["tweet_id"] = str(tweet_id)
+
+    return request_dict
