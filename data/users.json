@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "email": "user@example.com",
+    "first_name": "example",
+    "last_name": "example",
+    "birthday": "1981-11-19",
+    "password": "password123",
+    "user_id": "62f682c4-5adc-418b-a692-9c5488713a04"
+  },
+  {
+    "email": "user2@example.com",
+    "first_name": "example2",
+    "last_name": "example2",
+    "birthday": "2000-05-02",
+    "password": "userpassord2",
+    "user_id": "5074a065-1587-4620-8467-a4cea075a9d2"
+  }
+]

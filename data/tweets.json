@@ -1,1 +1,44 @@
-[]
+[
+  {
+    "content": "tweet1",
+    "by": { "email": "user@example.com" },
+    "created_at": "25/01/2022 12:42",
+    "updated_at": "25/01/2022 12:42",
+    "tweet_id": "b072e171-bdb9-44db-a8eb-8f3268047d35"
+  },
+  {
+    "content": "tweetupdate1",
+    "by": { "email": "user@example.com" },
+    "created_at": "25/01/2022 12:42",
+    "updated_at": "25/01/2022 12:47",
+    "tweet_id": "1bd71f61-fb8e-493e-8802-ee9d8fdfef69"
+  },
+  {
+    "content": "tweetupdate2",
+    "by": { "email": "user@example.com" },
+    "created_at": "25/01/2022 12:42",
+    "updated_at": "25/01/2022 12:47",
+    "tweet_id": "7675dd56-bd92-4cd2-bd41-85002a85c4ea"
+  },
+  {
+    "content": "tweet1",
+    "by": { "email": "user2@example.com" },
+    "created_at": "25/01/2022 12:44",
+    "updated_at": "25/01/2022 12:44",
+    "tweet_id": "de9af798-6ab0-436f-acab-7e94bc1e3080"
+  },
+  {
+    "content": "tweetupdate3",
+    "by": { "email": "user2@example.com" },
+    "created_at": "25/01/2022 12:44",
+    "updated_at": "25/01/2022 12:47",
+    "tweet_id": "c18905a3-7ea4-498a-b431-867d8548b75c"
+  },
+  {
+    "content": "tweet3",
+    "by": { "email": "user2@example.com" },
+    "created_at": "25/01/2022 12:44",
+    "updated_at": "25/01/2022 12:44",
+    "tweet_id": "58216eb3-13a1-4489-805d-863bf3f29191"
+  }
+]
