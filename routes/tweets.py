@@ -3,10 +3,10 @@ from datetime import datetime
 from pydantic import UUID4
 from fastapi import Body, Path, HTTPException, status
 from models import (
-    TweetPost,
-    TweetUpdate,
+    Tweet,
     TweetResponse,
     TweetAllResponse,
+    TweetContent,
     TweetDeleteResponse,
 )
 from tools.tools import (
@@ -29,7 +29,7 @@ def Tweets(app):
         summary="Post a Tweet",
         tags=["Tweets"],
     )
-    def tweet(tweet: TweetPost = Body(...)):
+    def tweet(tweet: Tweet = Body(...)):
         database_tweet_registers = read_file(database)
         database_user_registers = read_file("data/users.json")
 
@@ -86,7 +86,7 @@ def Tweets(app):
         tags=["Tweets"],
     )
     def update_tweet(
-        tweet_id: UUID4 = Path(...), tweet_update: TweetUpdate = Body(...)
+        tweet_id: UUID4 = Path(...), tweet_update: TweetContent = Body(...)
     ):
 
         database_registers = read_file(database)

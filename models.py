@@ -2,6 +2,7 @@ from datetime import date
 from pydantic import BaseModel, EmailStr, Field, UUID4
 
 
+# User
 class UserEmail(BaseModel):
     email: EmailStr = Field(...)
 
@@ -36,36 +37,31 @@ class UserLogin(UserPassword, UserEmail):
     ...
 
 
-class UserMessages(UserEmail):
+class UserMessages(UserEmail, UserId):
     message: str = Field(...)
 
 
-
-class TweetPost(BaseModel):
-    content: str = Field(...)
-    by: UserEmail = Field(...)
-
-
-class TweetUpdate(BaseModel):
+# Tweet
+class TweetContent(BaseModel):
     content: str = Field(...)
 
 
-class TweetAllResponse(BaseModel):
+class TweetID(BaseModel):
     tweet_id: UUID4 = Field(...)
-    content: str = Field(...)
-    created_at: str = Field(...)
-    updated_at: str = Field(...)
+
+
+class Tweet(TweetContent):
     by: UserEmail = Field(...)
 
 
-class TweetResponse(BaseModel):
-    content: str = Field(...)
-    created_at: str = Field(...)
-    updated_at: str = Field(...)
-    by: UserEmail = Field(...)
-
-
-
-class TweetDeleteResponse(BaseModel):
-    tweet_id: UUID4 = Field(...)
+class TweetDeleteResponse(TweetID):
     message: str = Field(...)
+
+
+class TweetResponse(Tweet):
+    created_at: str = Field(...)
+    updated_at: str = Field(...)
+
+
+class TweetAllResponse(TweetID, TweetResponse):
+    ...
