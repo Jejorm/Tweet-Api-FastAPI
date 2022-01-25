@@ -1,7 +1,7 @@
 import uuid
 from fastapi import Body, Path, HTTPException, status
 from models import UserAllResponse, UserLogin, UserUpdate, UserMessages, User
-from tools.tools import read_file, write_file, overwrite_file, check_user, serialize_user
+from tools.tools import read_file, modify_file, check_user, serialize_user
 from pydantic import UUID4
 
 
@@ -33,21 +33,19 @@ def Users(app):
            - password: str
            - user_id: UUID4
         """
-        
+
         databse_registers = read_file(database)
 
         for user in databse_registers:
-            if not check_user(user, "register", field_body=user_register):
+            if not check_user(user, operation="create", field_body=user_register):
                 raise HTTPException(status.HTTP_400_BAD_REQUEST,
-                                    detail="User already registered")
+                                    detail="Email already registered")
 
-        user_dict_serialized = serialize_user(user_register, user_id=uuid.uuid4())
-
+        user_dict_serialized = serialize_user(
+            user_register, user_id=uuid.uuid4())
         databse_registers.append(user_dict_serialized)
-
-        write_file(databse_registers, database)
-
-        return user_dict_serialized 
+        modify_file(databse_registers, database, "r+")
+        return user_dict_serialized
 
     # Login a User
     @app.post(
@@ -73,7 +71,7 @@ def Users(app):
         database_registers = read_file(database)
 
         for user in database_registers:
-            if check_user(user, "login", field_body=user_login):
+            if check_user(user, operation="login", field_body=user_login):
                 return UserMessages(message="Login Successfully!", **user)
 
         raise HTTPException(status.HTTP_400_BAD_REQUEST,
@@ -129,7 +127,7 @@ def Users(app):
         database_registers = read_file(database)
 
         for user in database_registers:
-            if check_user(user, "user_id", field_id=user_id):
+            if check_user(user, field_id=user_id):
                 return user
 
         raise HTTPException(status.HTTP_400_BAD_REQUEST,
@@ -164,18 +162,21 @@ def Users(app):
 
         database_registers = read_file(database)
 
+        for user in database_registers:
+            if not check_user(user, operation="create", field_body=user_update):
+                raise HTTPException(status.HTTP_404_NOT_FOUND,
+                                    detail="User ID does not exists or Email already registered!")
+
         for i, user in enumerate(database_registers):
-
-            if check_user(user, "user_id", field_id=user_id) and check_user(user, "register", field_body=user_update):
-                user_dict_serialized = serialize_user(user_update, user_id=user_id)
+            if check_user(user, field_id=user_id):
+                user_dict_serialized = serialize_user(
+                    user_update, user_id=user_id, email=user_update.email)
                 database_registers[i] = user_dict_serialized
-
-                overwrite_file(database_registers, database)
-
+                modify_file(database_registers, database, "w")
                 return database_registers[i]
 
         raise HTTPException(status.HTTP_404_NOT_FOUND,
-                        detail="User ID does not exists or Email already taken!")
+                            detail="User ID does not exists! or Email already registered!")
 
     # Delete a User
     @app.delete(
@@ -202,9 +203,9 @@ def Users(app):
 
         for user in database_registers:
 
-            if check_user(user, "user_id", field_id=user_id):
+            if check_user(user, field_id=user_id):
                 database_registers.remove(user)
-                overwrite_file(database_registers, database)
+                modify_file(database_registers, database, "w")
 
                 return UserMessages(message="User deleted successfully!", **user)
 
