@@ -30,6 +30,21 @@ def Tweets(app):
         tags=["Tweets"],
     )
     def tweet(tweet: Tweet = Body(...)):
+        """
+        This path operation post a tweet in the app
+
+        Parameters:
+           - Request Body
+               - tweet: Tweet
+
+        Returns a json with full details of the tweet.
+           - content: str
+           - by: UserEmail
+           - created_at: str
+           - updated_at: str
+           - tweet_id: UUID4
+        """
+
         database_tweet_registers = read_file(database)
         database_user_registers = read_file("data/users.json")
 
@@ -54,6 +69,18 @@ def Tweets(app):
         tags=["Tweets"],
     )
     def home():
+        """
+        This path operation shows all the tweets in the app
+
+        Parameters:
+           - None
+
+        Returns a json list with details of the tweet.
+           - content: str
+           - by: UserEmail
+           - created_at: str
+           - updated_at: str
+        """
 
         return read_file(database)
 
@@ -66,6 +93,19 @@ def Tweets(app):
         tags=["Tweets"],
     )
     def show_tweet(tweet_id: UUID4 = Path(...)):
+        """
+        This path operation show a tweet in the app
+
+        Parameters:
+           - Path Parameter
+               - tweet_id: UUID4
+
+        Returns a json with details of the tweet.
+           - content: str
+           - by: UserEmail
+           - created_at: str
+           - updated_at: str
+        """
 
         database_registers = read_file(database)
 
@@ -88,6 +128,21 @@ def Tweets(app):
     def update_tweet(
         tweet_id: UUID4 = Path(...), tweet_update: TweetContent = Body(...)
     ):
+        """
+        This path operation update a tweet in the app
+
+        Parameters:
+           - Path Parameter
+               - tweet_id: UUID4
+           - Request Body
+               - tweet_update: TweetContent
+
+        Returns a json with details of the tweet.
+           - content: str
+           - by: UserEmail
+           - created_at: str
+           - updated_at: str
+        """
 
         database_registers = read_file(database)
 
@@ -119,6 +174,17 @@ def Tweets(app):
         tags=["Tweets"],
     )
     def delete_tweet(tweet_id: UUID4 = Path(...)):
+        """
+        This path operation delete a tweet in the app
+
+        Parameters:
+           - Path Parameter
+               - tweet_id: UUID4
+
+        Returns a json with confirmation of the tweet deleted.
+           - message: str
+           - tweet_id: UUID4
+        """
 
         database_registers = read_file(database)
 

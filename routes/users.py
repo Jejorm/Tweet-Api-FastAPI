@@ -25,7 +25,7 @@ def Users(app):
            - Request Body
                - user: UserUpdate
 
-        Returns a json list with the basic user information
+        Returns a json with the basic user information
            - email: EmailStr
            - first_name: str
            - last_name: str
@@ -63,7 +63,7 @@ def Users(app):
            - Request Body
                - user: UserLogin
 
-        Returns a json list with the user login information:
+        Returns a json with the user login information:
            - email: EmailStr
            - message: str
         """
